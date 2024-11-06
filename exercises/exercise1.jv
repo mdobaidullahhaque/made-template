@@ -1,0 +1,82 @@
+// Exercise 1: Automated data pipeline of Airports  
+
+// As my OS is windows and with the v0.6.2 it gives problem related to windows path [issue: https://github.com/jvalue/jayvee/issues/623],
+// I have run this script withS v0.4.0, but I think it might also run on the v0.6.2.
+// It passed the github action workflow: exercise-feedback
+
+pipeline AirportsPipeline {
+
+  
+
+    // Syntax of a pipe
+    // connecting the block AirportsExtractor
+    // with the block AirportsTextFileInterpreter.
+    AirportsExtractor -> AirportsTextFileInterpreter;
+
+    
+    // Pipes can be further chained, 
+    // leading to an overview of the pipeline.
+    AirportsTextFileInterpreter
+        -> AirportsCSVInterpreter
+        // -> NameHeaderWriter [this block is being excluded because renaming was prohibited in the exercise instruction]
+        -> AirportsTableInterpreter
+        -> AirportsLoader;
+
+
+    // Blocks instantiate a blocktype by using the oftype keyword.
+    // The blocktype defines the available properties that the block
+    // can use to specify the intended behavior of the block 
+    block AirportsExtractor oftype HttpExtractor {
+
+        // Properties are assigned to concrete values.
+        // Here, we specify the URL where the file shall be downloaded from.
+        url: "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-flughafen-weltweit/exports/csv?lang=en&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B";
+    }
+
+    // The HttpExtractor requires no input and produces a binary file as output.
+    // This file has to be interpreted, e.g., as text file.
+    block AirportsTextFileInterpreter oftype TextFileInterpreter { }
+
+    // Next, we interpret the text file as sheet.
+    // A sheet only contains text cells and is useful for manipulating the shape of data before assigning more strict value types to cells.
+    block AirportsCSVInterpreter oftype CSVInterpreter {
+        delimiter: ";";
+    }
+
+    // We can write into cells of a sheet using the CellWriter block type.
+    // excluded this block as per exercise intruction to not alter any data ponts.
+    // block NameHeaderWriter oftype CellWriter {
+        
+        // at: cell A1;
+        // write: [
+        // "name"
+        // ];
+    // }
+
+    
+	// We define a valuetype per column that specifies the data type of the column.
+    // Rows that include values that are not valid according to the their valuetypes are dropped automatically. 
+    block AirportsTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "Lfd. Nummer" oftype integer,
+            "Name des Flughafens" oftype text,
+            "Ort" oftype text,
+            "Land" oftype text,
+            "IATA" oftype text,
+            "ICAO" oftype text,
+            "Latitude" oftype decimal,
+            "Longitude" oftype decimal,
+            "Altitude" oftype integer,  
+            // [Zeitzone, DST, Zeitzonen-Datenbank, geo_punkt] these columns are being excluded as per instruction
+        ];
+    }
+
+    // As a final step, we load the table into a sink,
+    // here into a sqlite file.
+    // The structure of the table is used to generate the correct table schema in the database.
+    block AirportsLoader oftype SQLiteLoader {
+        table: "airports";
+        file: "./airports.sqlite";
+    }
+}
