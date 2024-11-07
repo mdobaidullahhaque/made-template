@@ -22,19 +22,22 @@ Income inequality and healthcare access are critical factors influencing populat
 * Metadata URL: Kaggle Metadata
 * Data URL: https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank
 * Data Type: CSV
+
 Description: This dataset contains socio-economic indicators from the World Bank, including life expectancy, healthcare access, income inequality, and other relevant data for countries globally..
 
 ### Datasource2: WHO Global Health Observatory Data Repository
 * Metadata URL: WHO GHO Metadata
 * Data URL: https://apps.who.int/gho/data/view.main.HEALTHEXPCAP
 * Data Type: CSV
+
 Description: Contains healthcare access and expenditure data across countries, providing indicators such as healthcare facilities per capita and health spending per capita.
 
 ### Datasource3: World Bank Life Expectancy Data
 * Metadata URL: World Bank Life Expectancy
 * Data URL: https://data.worldbank.org/indicator/SP.DYN.LE00.IN
 * Data Type: CSV
-* Description: Life expectancy at birth data for countries worldwide, useful for analyzing health outcomes in relation to income inequality and healthcare investments across North and South America.
+
+Description: Life expectancy at birth data for countries worldwide, useful for analyzing health outcomes in relation to income inequality and healthcare investments across North and South America.
 
 ## Work Packages
 
