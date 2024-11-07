@@ -46,7 +46,7 @@ Description: Life expectancy at birth data for countries worldwide, useful for a
 1. Gathering suitable datasets #1
 2. Initial data exploration using python notebook #2
 3. Finding correlation among the datasets #3
-4. Building ETL pipeline. #4
+4. Building ETL pipeline #4
 5. Pattern analysis and building predictive models #5
 6. Training and testing the model #6
 7. Conclude the project and giving future scopes #7
