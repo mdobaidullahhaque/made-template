@@ -19,22 +19,22 @@ Income inequality and healthcare access are critical factors influencing populat
 <!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
 
 ### Datasource1: Life Expectancy and Socio-Economic Data (World Bank)
-* Metadata URL: Kaggle Metadata
-* Data URL: https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank
+* Metadata URL: [Kaggle Metadata](https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank)
+* Data URL: https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank?select=life+expectancy.csv
 * Data Type: CSV
 
 Description: This dataset contains socio-economic indicators from the World Bank, including life expectancy, healthcare access, income inequality, and other relevant data for countries globally..
 
 ### Datasource2: WHO Global Health Observatory Data Repository
-* Metadata URL: WHO GHO Metadata
-* Data URL: https://apps.who.int/gho/data/view.main.HEALTHEXPCAP
-* Data Type: CSV
+* Metadata URL: [WHO GHO Metadata](https://www.who.int/data/gho)
+* Data URL: https://apps.who.int/nha/database/Select/Indicators/en
+* Data Type: XLSX
 
 Description: Contains healthcare access and expenditure data across countries, providing indicators such as healthcare facilities per capita and health spending per capita.
 
 ### Datasource3: World Bank Life Expectancy Data
-* Metadata URL: World Bank Life Expectancy
-* Data URL: https://data.worldbank.org/indicator/SP.DYN.LE00.IN
+* Metadata URL: https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who
+* Data URL: https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who?select=Life+Expectancy+Data.csv
 * Data Type: CSV
 
 Description: Life expectancy at birth data for countries worldwide, useful for analyzing health outcomes in relation to income inequality and healthcare investments across North and South America.
