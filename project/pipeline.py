@@ -1,6 +1,16 @@
+!pip install opendatasets
+
 import kaggle
 import zipfile
 import os
+import opendatasets as od
+
+
+
+dataset = 'https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank?select=life+expectancy.csv'
+od.download(dataset)
+
+
 
 # Define Kaggle dataset and download path
 dataset = "mjshri23/life-expectancy-and-socio-economic-world-bank"
