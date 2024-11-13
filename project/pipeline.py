@@ -1,43 +1,19 @@
+import kaggle
+import zipfile
 import os
-import pandas as pd 
-import sqlite3
-import requests 
 
-# dataset of life expectancy and socio economic
-DATA_URL = "https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank"
+# Define Kaggle dataset and download path
+dataset = "mjshri23/life-expectancy-and-socio-economic-world-bank"
+download_path = "data"
 
-# Directories
-DATA_DIR = "/data"
-DB_FILE = os.path.join(DATA_DIR, "life_expectancy.db")
+# Download dataset using Kaggle API
+kaggle.api.dataset_download_files(dataset, path=download_path, unzip=True)
 
-# Ensure the data directory exists
-os.makedirs(DATA_DIR, exist_ok=True)
+# Verify download by listing files
+print("Files downloaded to 'data' directory:")
+print(os.listdir(download_path))
 
-def download_data(url, file_path):
-
-    """This code download dataset from the given URL."""
-
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open(file_path, 'wb') as f:
-            f.write(response.content)
-        print(f"Successfully downloaded data  and saved to {file_path}")
-    else:
-        print("Wrong!!\nFailed to download the dataset")
-
-
-def main():
-    # Download dataset (update with actual download handling if needed)
-    csv_file_path = os.path.join(DATA_DIR, "life_expectancy.csv")
-    download_data(DATA_URL, csv_file_path)
-    
-    # Here Load and clean data
-    df = load_and_clean_data(csv_file_path)
-    
-    # Save cleaned data to SQLite
-    save_to_sqlite(df, DB_FILE)
-
-if __name__ == "__main__":
-    main()
-
-
+import pandas as pd
+file_path = os.path.join(download_path, "life-expectancy-data.csv")  # Adjust filename as needed
+df = pd.read_csv(file_path)
+print(df.head())
