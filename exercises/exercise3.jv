@@ -1,0 +1,116 @@
+// Example Jayvee model for the World Bank Dataset
+
+pipeline WorldBankDataPipeline {
+
+
+  // Block to retrieve the Excel dataset from the provided URL
+  block DataExtractor oftype HttpExtractor {
+    url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+  }
+
+  block WorldbankXLSXInterpreter oftype XLSXInterpreter { }
+
+
+  // Block to process the structure of the Excel file
+  block ExcelSheetinterpreter oftype SheetPicker {
+    sheetName: 'Figure S5.1.2';
+   }
+
+  block RenameCountryCode oftype CellWriter {
+        at: range P2:P2;
+        write: [
+            "Country Code",
+        ];
+    }
+
+  block DataCleaner oftype CellWriter {
+      at: range R2:S2;
+      write: [
+          "GDP per Capita",
+          "Bond Issuance Share"
+      ];
+  }
+
+
+  block DataRange oftype CellRangeSelector {
+      select: range P2:S45; // Drop rows that fail validation
+  }
+
+  // Block for processing and storing GDP data in a database table
+  block GDPTableInterpreter oftype TableInterpreter {
+    header: true;
+    columns: [
+      "Country Code" oftype CountryCodeAlpha3,
+      "GDP per Capita" oftype positiveDecimal
+    ];
+  }
+
+  block GDPTableLoader oftype SQLiteLoader {
+    table: "gdpPerCapita";
+    file: "country-stats.sqlite";
+  }
+
+  // Block for processing and storing Bond Issuance Share data in a database table
+
+  block BondIssuanceTableInterpreter oftype TableInterpreter {
+    header: true;
+    columns: [
+      "Country Code" oftype CountryCodeAlpha3,
+      "Bond Issuance Share" oftype valueBetweenZeroAndOne
+    ];
+  }
+
+  block BondIssuanceLoader oftype SQLiteLoader {
+    table: "bondIssuance";
+    file: "country-stats.sqlite";
+  }
+
+  // Dataset from the provided URL
+  DataExtractor
+    -> WorldbankXLSXInterpreter
+    -> ExcelSheetinterpreter
+    -> RenameCountryCode
+    -> DataCleaner
+    -> DataRange
+    -> BondIssuanceTableInterpreter
+    -> BondIssuanceLoader;
+    
+  // Two separate tables for the data
+  DataRange
+    -> GDPTableInterpreter
+    -> GDPTableLoader;
+
+}
+
+
+// Custom type for positive decimal values
+valuetype positiveDecimal oftype decimal {
+    constraints: [
+        positiveDecimalValidator
+    ];
+}
+
+// Custom type for ISO 3166-1 Alpha-3 country codes
+valuetype ISO_3166_1 oftype text {
+    constraints: [
+        ISO_3166_1_Validator
+    ];
+}
+
+// Constraint for validating ISO 3166-1 Alpha-3 country codes
+constraint ISO_3166_1_Validator oftype RegexConstraint {
+    regex: /^[A-Z]{3}$/;
+}
+
+constraint positiveDecimalValidator on decimal: value > 0;
+
+
+// Constraint for ensuring values are within the range [0, 1]
+constraint valueBetweenZeroAndOneValidator on decimal: value >= 0 and value <= 1;
+
+valuetype valueBetweenZeroAndOne oftype decimal {
+    constraints: [
+        valueBetweenZeroAndOneValidator
+    ];
+}
+
