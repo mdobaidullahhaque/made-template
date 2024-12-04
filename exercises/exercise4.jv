@@ -1,0 +1,91 @@
+pipeline WeatherPipeline_ex4 {
+
+
+    block WeatherDataExtractor oftype HttpExtractor {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+    }
+
+    block WeatherArchiveHandler oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+    block WeatherFileSelector oftype FilePicker {
+        path: "/data.csv";
+    }
+
+    block WeatherFileProcessor oftype TextFileInterpreter { }
+
+    block WeatherCSVParser oftype CSVInterpreter { 
+        delimiter: ";";
+    }
+
+    // Remove intermediate columns for proper structure
+    block WeatherColumnRemover oftype ColumnDeleter {
+        delete: [column F, column G, column H, column I];
+    }
+
+    block WeatherDataInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "recordId" oftype integer,
+            "deviceManufacturer" oftype text,
+            "deviceModel" oftype text,
+            "observationMonth" oftype MonthCategory,
+            "airTemperature" oftype decimal,
+            "batteryTemperature" oftype decimal
+        ];
+    }
+
+    transform CelsiusToFahrenheitConversion {
+        from CelsiusValue oftype decimal;
+        to FahrenheitValue oftype decimal;
+
+        FahrenheitValue: (CelsiusValue * 9/5) + 32;
+    }
+
+    block CelsiusToFahrenheitTransformerTemperature oftype TableTransformer {
+        inputColumns: ['airTemperature'];
+        outputColumn: 'airTemperature';
+        uses: CelsiusToFahrenheitConversion;
+    }
+
+    block CelsiusToFahrenheitTransformerBattery oftype TableTransformer {
+        inputColumns: ['batteryTemperature'];
+        outputColumn: 'batteryTemperature';
+        uses: CelsiusToFahrenheitConversion;
+    }
+
+    constraint recordIdConstraint on integer:
+        value > 0;
+
+    valuetype MonthCategory oftype integer {
+        constraints: [validMonthRange];
+    }
+
+    constraint validMonthRange oftype RangeConstraint {
+        lowerBound: 1;
+        lowerBoundInclusive: true;
+        upperBound: 12;
+        upperBoundInclusive: true;
+    }
+
+    constraint temperatureValueRange on decimal:
+        value > -1000 and value < 3000;
+
+    block WeatherDataLoader oftype SQLiteLoader {
+        table: "weatherData";
+        file: "./weather_data.sqlite";
+    }
+
+
+     WeatherDataExtractor
+        -> WeatherArchiveHandler
+        -> WeatherFileSelector
+        -> WeatherFileProcessor
+        -> WeatherCSVParser
+        -> WeatherColumnRemover
+        -> WeatherDataInterpreter
+        -> CelsiusToFahrenheitTransformerTemperature
+        -> CelsiusToFahrenheitTransformerBattery
+        -> WeatherDataLoader;
+}
