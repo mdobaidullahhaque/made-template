@@ -7,16 +7,11 @@ import pandas as pd
 import sqlite3
 
 #Kaggle dataset download path
-
 dataset = 'https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank?select=life+expectancy.csv'
 od.download(dataset)
 
-
 data_dir = '.\life-expectancy-and-socio-economic-world-bank'
 os.listdir(data_dir)
-
-
-
 
 # Define directories
 data_directory = "../data"
@@ -43,7 +38,7 @@ output_db = os.path.join(data_directory, "life_socio_economic_data.db")
 def clean_and_filter_data(file_path, countries):
     # Read the dataset
     df = pd.read_csv(file_path)
-    # Filter for specified countries
+   
     df_filtered = df[df["Country Name"].isin(countries)]
     # Select relevant columns (e.g., life expectancy, GDP per capita, etc.)
     columns_to_keep = [
