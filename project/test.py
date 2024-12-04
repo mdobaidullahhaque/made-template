@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import os
 import sqlite3
 import pandas as pd
@@ -119,8 +116,6 @@ if __name__ == "__main__":
 
     print("All tests passed successfully.")
 
-
-# In[ ]:
 
 
 
