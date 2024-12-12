@@ -30,4 +30,5 @@ jobs:
      
       - name: Unit Tests Run
         run: |
-          python3 -m unittest project/test.py
+          chmod +x ./project/test.sh
+          ./project/test.sh 
