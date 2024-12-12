@@ -24,6 +24,8 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install pandas sqlite3
+          pip install sqlalchemy
+          pip install requests
 
      
       - name: Unit Tests Run
