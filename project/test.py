@@ -5,6 +5,7 @@ import os
 import sqlite3
 import pandas as pd
 import subprocess
+import sys
 
 
 # Define paths and constants
@@ -20,7 +21,9 @@ def test_pipeline_execution():
     
     #Test if the pipeline script executes successfully.
     print("Testing pipeline execution...")
-    result = subprocess.run(["python", PIPELINE_SCRIPT], capture_output=True, text=True)
+    subprocess.run([sys.executable, "-m", "pip", "install", "opendatasets"], check=True)
+    result = subprocess.run(["python", "project/pipeline.py"], capture_output=True, text=True)
+    #result = subprocess.run(["python", PIPELINE_SCRIPT], capture_output=True, text=True)
     assert result.returncode == 0, f"Pipeline script failed: {result.stderr}"
     print("Pipeline executed successfully.")
 
