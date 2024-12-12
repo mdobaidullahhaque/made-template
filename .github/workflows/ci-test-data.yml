@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  run:
+  run-tests:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -19,16 +20,12 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install all dependencies
+      - name: All Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pandas
-          pip install sqlalchemy
-          pip install requests
-          
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas sqlite3
 
-
-      - name: Run tests file
+     
+      - name: Unit Tests Run
         run: |
-          chmod +x ./project/test.sh
-          ./project/test.sh
+          python3 -m unittest project/test.py
