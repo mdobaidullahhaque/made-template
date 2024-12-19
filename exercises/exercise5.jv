@@ -1,91 +1,78 @@
-pipeline WeatherPipeline_ex4 {
+pipeline GTFSHandler {
 
+  // Block to fetch the GTFS zip file
+  block GTFSFetcher oftype HttpExtractor {
+      url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip"; 
+  }
 
-    block WeatherDataExtractor oftype HttpExtractor {
-        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
-    }
+  // Block to handle and extract the zip archive
+  block ZipProcessor oftype ArchiveInterpreter {
+      archiveType: "zip"; 
+  }
 
-    block WeatherArchiveHandler oftype ArchiveInterpreter {
-        archiveType: "zip";
-    }
+  // Block to locate the stops.txt file within the archive
+  block SelectStopsFile oftype FilePicker {
+      path: "./stops.txt"; 
+  }
 
-    block WeatherFileSelector oftype FilePicker {
-        path: "/data.csv";
-    }
+  // Block to decode stops.txt as UTF-8
+  block DecodeStopsFile oftype TextFileInterpreter {
+      encoding: "utf8"; 
+  }
 
-    block WeatherFileProcessor oftype TextFileInterpreter { }
+  // Block to parse stops.txt as CSV
+  block ParseStopsCSV oftype CSVInterpreter {
+      delimiter: ","; 
+      enclosing: '"'; 
+  }
 
-    block WeatherCSVParser oftype CSVInterpreter { 
-        delimiter: ";";
-    }
+  // Validation rules
+  constraint LatLonConstraint oftype RangeConstraint {
+      lowerBound: -90;
+      upperBound: 90;
+      lowerBoundInclusive: true;
+      upperBoundInclusive: true;
+  }
 
-    // Remove intermediate columns for proper structure
-    block WeatherColumnRemover oftype ColumnDeleter {
-        delete: [column F, column G, column H, column I];
-    }
+  valuetype GeoCoordinate oftype decimal {
+      constraints: [LatLonConstraint]; 
+  }
 
-    block WeatherDataInterpreter oftype TableInterpreter {
-        header: false;
-        columns: [
-            "recordId" oftype integer,
-            "deviceManufacturer" oftype text,
-            "deviceModel" oftype text,
-            "observationMonth" oftype MonthCategory,
-            "airTemperature" oftype decimal,
-            "batteryTemperature" oftype decimal
-        ];
-    }
+  constraint ZoneConstraint oftype RangeConstraint {
+      lowerBound: 1925;
+      upperBound: 1925;
+      lowerBoundInclusive: true;
+      upperBoundInclusive: true;
+  }
 
-    transform CelsiusToFahrenheitConversion {
-        from CelsiusValue oftype decimal;
-        to FahrenheitValue oftype decimal;
+  valuetype ZoneID oftype integer {
+      constraints: [ZoneConstraint]; 
+  }
 
-        FahrenheitValue: (CelsiusValue * 9/5) + 32;
-    }
+  // Block to filter and validate stops data
+  block FilterStopsTable oftype TableInterpreter {
+      header: true; 
+      columns: [
+          "stop_id" oftype integer,
+          "stop_name" oftype text,
+          "stop_lat" oftype GeoCoordinate,
+          "stop_lon" oftype GeoCoordinate,
+          "zone_id" oftype ZoneID
+      ]; 
+  }
 
-    block CelsiusToFahrenheitTransformerTemperature oftype TableTransformer {
-        inputColumns: ['airTemperature'];
-        outputColumn: 'airTemperature';
-        uses: CelsiusToFahrenheitConversion;
-    }
+  // Block to store the filtered stops data in SQLite
+  block SaveToDatabase oftype SQLiteLoader {
+      table: "stops"; 
+      file: "gtfs.sqlite"; 
+  }
 
-    block CelsiusToFahrenheitTransformerBattery oftype TableTransformer {
-        inputColumns: ['batteryTemperature'];
-        outputColumn: 'batteryTemperature';
-        uses: CelsiusToFahrenheitConversion;
-    }
+   GTFSFetcher
+    -> ZipProcessor
+    -> SelectStopsFile
+    -> DecodeStopsFile
+    -> ParseStopsCSV
+    -> FilterStopsTable
+    -> SaveToDatabase;
 
-    constraint recordIdConstraint on integer:
-        value > 0;
-
-    valuetype MonthCategory oftype integer {
-        constraints: [validMonthRange];
-    }
-
-    constraint validMonthRange oftype RangeConstraint {
-        lowerBound: 1;
-        lowerBoundInclusive: true;
-        upperBound: 12;
-        upperBoundInclusive: true;
-    }
-
-    constraint temperatureValueRange on decimal:
-        value > -1000 and value < 3000;
-
-    block WeatherDataLoader oftype SQLiteLoader {
-        table: "weatherData";
-        file: "./weather_data.sqlite";
-    }
-
-
-     WeatherDataExtractor
-        -> WeatherArchiveHandler
-        -> WeatherFileSelector
-        -> WeatherFileProcessor
-        -> WeatherCSVParser
-        -> WeatherColumnRemover
-        -> WeatherDataInterpreter
-        -> CelsiusToFahrenheitTransformerTemperature
-        -> CelsiusToFahrenheitTransformerBattery
-        -> WeatherDataLoader;
 }
