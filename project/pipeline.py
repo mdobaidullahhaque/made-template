@@ -30,7 +30,6 @@ american_countries = [
     "Suriname", "French Guiana"
 ]
 
-# Paths to Kaggle files (adjust these paths based on your dataset's location)
 life_exp_csv = os.path.join(data_directory, "LifeExpectancyData.csv")
 output_db = os.path.join(data_directory, "life_socio_economic_data.db")
 
