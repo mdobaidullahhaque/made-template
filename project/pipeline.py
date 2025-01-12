@@ -1,14 +1,16 @@
 !pip install opendatasets
+!pip install kagglehub
 
+import kagglehub
 import opendatasets as od
 import os
 import pandas as pd
 
 import sqlite3
 
+
 #Kaggle dataset download path
-dataset = 'https://www.kaggle.com/datasets/mjshri23/life-expectancy-and-socio-economic-world-bank?select=life+expectancy.csv'
-od.download(dataset)
+dataset = kagglehub.dataset_download("mjshri23/life-expectancy-and-socio-economic-world-bank")
 
 data_dir = '.\life-expectancy-and-socio-economic-world-bank'
 os.listdir(data_dir)
@@ -30,8 +32,9 @@ american_countries = [
     "Suriname", "French Guiana"
 ]
 
-life_exp_csv = os.path.join(data_directory, "LifeExpectancyData.csv")
-output_db = os.path.join(data_directory, "life_socio_economic_data.db")
+
+life_exp_csv = os.path.join(data_directory, r"E:\DS Semester Study\Winter 2024-25\MADE\life expectancy.csv")
+output_db = os.path.join(data_directory, f"E:\DS Semester Study\Winter 2024-25\MADE\life expectancy.db")
 
 # Function to clean and reshape life expectancy and socio-economic data
 def clean_and_filter_data(file_path, countries):
@@ -39,12 +42,13 @@ def clean_and_filter_data(file_path, countries):
     df = pd.read_csv(file_path)
    
     df_filtered = df[df["Country Name"].isin(countries)]
-    # Select relevant columns (e.g., life expectancy, GDP per capita, etc.)
+    
     columns_to_keep = [
-        "Country Name", "Country Code", "Year", "Life Expectancy", "GDP per capita",
-        "Health expenditure (% of GDP)", "Education expenditure (% of GDP)"
+        "Country Name", "Country Code", "Year", "Life Expectancy World Bank", "IncomeGroup",
+        "Health Expenditure %", "Education Expenditure %", "CO2"
     ]
     df_cleaned = df_filtered[columns_to_keep]
+    
     # Drop rows with missing values
     df_cleaned = df_cleaned.dropna()
     return df_cleaned
@@ -65,7 +69,3 @@ if os.path.exists(life_exp_csv):
     export_to_sqlite(cleaned_data, "life_socio_economic_data", output_db)
 else:
     print(f"Dataset not found at {life_exp_csv}. Please ensure the file is downloaded and placed correctly.")
-
-#  Here ['life expectancy.csv']
-#life_df = pd.read_csv('Life expectancy.csv')
-#life_df
