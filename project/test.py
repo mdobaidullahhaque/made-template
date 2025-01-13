@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+!pip install opendatasets
 import os
 import sqlite3
 import pandas as pd
@@ -11,19 +11,19 @@ import sys
 # Define paths and constants
 DATA_DIR = "../data"
 LIFE_EXP_CSV = os.path.join(DATA_DIR, "life_expectancy_cleaned.csv")
-SOCIO_ECON_CSV = os.path.join(DATA_DIR, "socio_economic_cleaned.csv")
-SQLITE_DB = os.path.join(DATA_DIR, "life_socio_economic_data.db")
+BIRTH_EXP_CSV = os.path.join(DATA_DIR, "brith_expectancy_cleaned.csv")
+SQLITE_DB = os.path.join(DATA_DIR, "life expectancy.db")
 #PIPELINE_SCRIPT = "pipeline.py"
 PIPELINE_SCRIPT = "./project/pipeline.py"
+#PIPELINE_SCRIPT = r"E:\DS Semester Study\Winter 2024-25\MADE\Dataset\pipeline.py"
 
 
 def test_pipeline_execution():
     
     #Test if the pipeline script executes successfully.
     print("Testing pipeline execution...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "opendatasets"], check=True)
-    result = subprocess.run(["python", "project/pipeline.py"], capture_output=True, text=True)
-    #result = subprocess.run(["python", PIPELINE_SCRIPT], capture_output=True, text=True)
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'opendatasets'])
+    result = subprocess.run(["python", PIPELINE_SCRIPT], capture_output=True, text=True)
     assert result.returncode == 0, f"Pipeline script failed: {result.stderr}"
     print("Pipeline executed successfully.")
 
@@ -41,7 +41,7 @@ def test_socio_econ_csv_exists():
     #Test if the Socio-Economic cleaned CSV file is created.
     
     print("Testing if Socio-Economic cleaned CSV exists...")
-    assert os.path.exists(SOCIO_ECON_CSV), f"Socio-Economic cleaned CSV file not found: {SOCIO_ECON_CSV}"
+    assert os.path.exists(BIRTH_EXP_CSV), f"Socio-Economic cleaned CSV file not found: {SOCIO_ECON_CSV}"
     print("Socio-Economic cleaned CSV exists.")
 
 
@@ -50,7 +50,7 @@ def test_life_exp_csv_content():
     #Test the content of the Life Expectancy cleaned CSV file.
    
     print("Testing Life Expectancy cleaned CSV content.")
-    df = pd.read_csv(LIFE_EXP_CSV)
+    df = pd.read_csv(r"E:\DS Semester Study\Winter 2024-25\MADE\life_expectancy_cleaned.csv")
     assert not df.empty, "Life Expectancy cleaned CSV file is empty."
     assert "Country Name" in df.columns, "Expected column 'Country Name' not found in Life Expectancy CSV."
     assert "Year" in df.columns, "Expected column 'Year' not found in Life Expectancy CSV."
@@ -62,7 +62,7 @@ def test_socio_econ_csv_content():
     #Test the content of the Socio-Economic cleaned CSV file.
     
     print("Testing Socio-Economic cleaned CSV content.")
-    df = pd.read_csv(SOCIO_ECON_CSV)
+    df = pd.read_csv(r"E:\DS Semester Study\Winter 2024-25\MADE\birth_expectancy_cleaned.csv")
     assert not df.empty, "Socio-Economic cleaned CSV file is empty."
     assert "Country Name" in df.columns, "Expected column 'Country Name' not found in Socio-Economic CSV."
     assert "Year" in df.columns, "Expected column 'Year' not found in Socio-Economic CSV."
@@ -83,7 +83,7 @@ def test_sqlite_tables():
     #Test if the expected tables exist in the SQLite database.
     
     print("Testing SQLite database tables.")
-    with sqlite3.connect(SQLITE_DB) as conn:
+    with sqlite3.connect(r"E:\DS Semester Study\Winter 2024-25\MADE\life expectancy.db") as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = [row[0] for row in cursor.fetchall()]
@@ -97,7 +97,7 @@ def test_sqlite_table_content():
     #Test the content of the tables in the SQLite database.
     
     print("Testing SQLite database table content...")
-    with sqlite3.connect(SQLITE_DB) as conn:
+    with sqlite3.connect(r"E:\DS Semester Study\Winter 2024-25\MADE\birth expectancy.db") as conn:
         life_exp_df = pd.read_sql("SELECT * FROM life_expectancy_data;", conn)
         socio_econ_df = pd.read_sql("SELECT * FROM socio_economic_data;", conn)
         assert not life_exp_df.empty, "Table 'life_expectancy_data' in SQLite database is empty."
@@ -117,8 +117,3 @@ if __name__ == "__main__":
     test_sqlite_table_content()
 
     print("All tests passed successfully.")
-
-
-
-
-
