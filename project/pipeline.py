@@ -37,7 +37,7 @@ american_countries = [
 
 
 life_exp_csv = os.path.join(data_directory, r"E:\DS Semester Study\Winter 2024-25\MADE\life expectancy.csv")
-output_db = os.path.join(data_directory, f"E:\DS Semester Study\Winter 2024-25\MADE\life expectancy.db")
+output_db = os.path.join(data_directory, r"E:\DS Semester Study\Winter 2024-25\MADE\life expectancy.db")
 
 
 birth_exp_csv = os.path.join(data_directory, r"E:\DS Semester Study\Winter 2024-25\MADE\birth expectancy.csv")
